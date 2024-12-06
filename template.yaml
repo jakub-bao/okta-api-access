@@ -1,9 +1,8 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  Debug DATIM Okta integration locally
+  Query OKTA API to test it
 
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 60
@@ -16,10 +15,6 @@ Parameters:
   secGroupId:
     Type: AWS::SSM::Parameter::Value<String>
     Default: pdap-vpc-SecurityGroupId
-
-  oktaClientId:
-    Type: AWS::SSM::Parameter::Value<String>
-    Default: 0oathu4y0sBs9fRFM297
 
 Resources:
   GetByEmail:
@@ -35,10 +30,17 @@ Resources:
           - !Ref subnetId
         SecurityGroupIds:
           - !Ref secGroupId
-      Events:
-        HelloWorld:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-          Properties:
-            Path: /hello
-            Method: get
+      Policies:
+        - Version: 2012-10-17
+          Statement:
+            - Sid: GetSecretValue
+              Effect: Allow
+              Action:
+                - secretsmanager:*
+              Resource:
+                - '*'
 
+Outputs:
+  GetByEmail:
+    Description: "Function ARN"
+    Value: !GetAtt GetByEmail.Arn
